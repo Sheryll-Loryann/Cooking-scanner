@@ -1,11 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title>Cooking Scanner</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#f7f8f3">
+        <title>Cookin' | Find something delicious</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        
+        <header class="topbar">
+            <a class="brand" href="#top" aria-label="Cookin' home">
+                <span class="brand-mark" aria-hidden="true">c</span>
+                <span>cookin<span class="brand-period">.</span></span>
+            </a>
+            <nav class="top-nav" aria-label="Main navigation">
+                <a class="nav-link nav-link-active" href="#scanner">Recipe finder</a>
+                <a class="nav-link" href="#recipe">My recipes</a>
+            </nav>
+            <button class="profile-button" type="button" aria-label="Your profile">J</button>
+        </header>
+
+        <main id="top" class="page-shell">
+            <section class="intro" aria-labelledby="page-title">
+                <div class="intro-copy">
+                    <p class="eyebrow"><span class="eyebrow-dot"></span> YOUR KITCHEN, REIMAGINED</p>
+                    <h1 id="page-title">Good food starts<br>with <em>what you have.</em></h1>
+                    <p class="intro-text">Show us what’s in your kitchen. We’ll find something worth making.</p>
+                </div>
+                <div class="intro-note" aria-hidden="true">
+                    <span class="note-spark">✳</span>
+                    <span>Less wondering.<br><strong>More “that’s delicious.”</strong></span>
+                </div>
+            </section>
+
+            <div class="workspace" id="scanner">
+                <section class="finder-panel" aria-labelledby="finder-title">
+                    <div class="panel-heading">
+                        <div class="step-number">01</div>
+                        <div>
+                            <p class="section-kicker">LET’S TAKE A LOOK</p>
+                            <h2 id="finder-title">What’s in your kitchen?</h2>
+                        </div>
+                    </div>
+
+                    <div class="scan-options">
+                        <label class="scan-option scan-option-primary" for="camera-input">
+                            <span class="scan-icon camera-icon" aria-hidden="true"></span>
+                            <span class="scan-option-copy"><strong>Take a photo</strong><small>Snap what’s on your counter</small></span>
+                            <span class="option-arrow" aria-hidden="true">↗</span>
+                        </label>
+                        <input class="visually-hidden" id="camera-input" type="file" accept="image/*" capture="environment">
+
+                        <label class="scan-option" for="upload-input">
+                            <span class="scan-icon upload-icon" aria-hidden="true"></span>
+                            <span class="scan-option-copy"><strong>Upload a photo</strong><small>Choose from your device</small></span>
+                            <span class="option-arrow" aria-hidden="true">↗</span>
+                        </label>
+                        <input class="visually-hidden" id="upload-input" type="file" accept="image/*">
+                    </div>
+
+                    <div class="manual-entry">
+                        <span class="manual-rule"></span>
+                        <span>OR ADD INGREDIENTS</span>
+                        <span class="manual-rule"></span>
+                    </div>
+                    <label class="field-label" for="ingredients">Ingredients you have</label>
+                    <textarea id="ingredients" name="ingredients" rows="2" placeholder="Try spinach, eggs, feta..."></textarea>
+
+                    <div class="panel-divider"></div>
+                    <div class="panel-heading preferences-heading">
+                        <div class="step-number">02</div>
+                        <div>
+                            <p class="section-kicker">MAKE IT YOURS</p>
+                            <h2>Set your table</h2>
+                        </div>
+                    </div>
+
+                    <div class="preference-fields">
+                        <div class="preference-field">
+                            <label class="field-label" for="servings">Servings</label>
+                            <div class="select-wrap">
+                                <select id="servings" name="servings">
+                                    <option>1 person</option>
+                                    <option selected>2 people</option>
+                                    <option>3 people</option>
+                                    <option>4 people</option>
+                                    <option>5+ people</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="preference-field">
+                            <label class="field-label" for="cook-time">Time available</label>
+                            <div class="select-wrap">
+                                <select id="cook-time" name="cook-time">
+                                    <option>15 minutes</option>
+                                    <option selected>30 minutes</option>
+                                    <option>45 minutes</option>
+                                    <option>Any amount of time</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="find-button" type="button">
+                        Find my recipe <span aria-hidden="true">↗</span>
+                    </button>
+                    <p class="privacy-note"><span class="privacy-lock" aria-hidden="true"></span> Your kitchen photos stay yours</p>
+                </section>
+
+                <section class="recipe-panel" id="recipe" aria-labelledby="recipe-heading">
+                    <div class="recipe-panel-top">
+                        <div>
+                            <p class="section-kicker">A LITTLE INSPIRATION</p>
+                            <h2 id="recipe-heading">On the menu</h2>
+                        </div>
+                        <span class="match-label"><span></span> YOUR RECIPE</span>
+                    </div>
+
+                    <article class="recipe-card">
+                        <div class="recipe-image-wrap">
+                            <img class="recipe-image" src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1400&q=85" alt="Colorful bowl of fresh greens, vegetables, and grains">
+                            <span class="image-tag"><span aria-hidden="true">✳</span> FRESH PICK</span>
+                            <button class="save-button" type="button" aria-label="Save recipe"><span aria-hidden="true">♡</span></button>
+                        </div>
+                        <div class="recipe-content">
+                            <div class="recipe-meta">
+                                <span><span class="meta-clock" aria-hidden="true"></span> 25 min</span>
+                                <span class="meta-separator"></span>
+                                <span>Easy</span>
+                                <span class="meta-separator"></span>
+                                <span>Serves 2</span>
+                            </div>
+                            <h3 class="recipe-title">Green goddess<br>grain bowl</h3>
+                            <p class="recipe-description">Crisp greens, warm grains, and a bright herby dressing. A little bit of everything, exactly as it should be.</p>
+                            <div class="recipe-name-field">
+                                <label for="recipe-name">RECIPE NAME</label>
+                                <output id="recipe-name" name="recipe-name">Green goddess grain bowl</output>
+                            </div>
+                            <div class="recipe-details">
+                                <div class="detail-block">
+                                    <h4>YOU’LL NEED</h4>
+                                    <p>Greens <span>·</span> grains <span>·</span> avocado <span>·</span> lemon</p>
+                                </div>
+                                <div class="detail-block">
+                                    <h4>THE SHORT VERSION</h4>
+                                    <p>Build your bowl, whisk the dressing, and bring it all together.</p>
+                                </div>
+                            </div>
+                            <button class="recipe-button" type="button">See the full recipe <span aria-hidden="true">→</span></button>
+                        </div>
+                    </article>
+                    <p class="recipe-footnote">A sample recipe preview. Your suggestions will be tailored to your ingredients.</p>
+                </section>
+            </div>
+            <footer class="page-footer"><span>MADE FOR THE EVERYDAY COOK</span><span>Good things are growing.</span></footer>
+        </main>
         <script src="script.js"></script>
     </body>
 </html>
