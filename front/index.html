@@ -62,6 +62,12 @@
                         <input class="visually-hidden" id="upload-input" type="file" accept="image/*">
                     </div>
 
+                    <div class="scan-results" id="scan-results" hidden>
+                        <p class="scan-status" id="scan-status" role="status" aria-live="polite"></p>
+                        <ul class="ingredient-chips" id="ingredient-chips" aria-label="Scanned ingredients"></ul>
+                        <button class="chip-add" id="chip-add" type="button" hidden>+ Add ingredient</button>
+                    </div>
+
                     <div class="manual-entry">
                         <span class="manual-rule"></span>
                         <span>OR ADD INGREDIENTS</span>
