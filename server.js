@@ -4,6 +4,7 @@ import multer from "multer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { GoogleGenAI } from "@google/genai";
+import { findRecipes } from "./recipes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -29,12 +30,12 @@ const upload = multer({
         if (file.mimetype.startsWith("image/")) {
             cb(null, true);
         } else {
-            cb(new ScanError(400, "That file isn't an image. Please choose a photo."));
+            cb(new ApiError(400, "That file isn't an image. Please choose a photo."));
         }
     },
 });
 
-class ScanError extends Error {
+class ApiError extends Error {
     constructor(status, message) {
         super(message);
         this.status = status;
@@ -47,17 +48,17 @@ function parseIngredientList(text) {
     const start = cleaned.indexOf("[");
     const end = cleaned.lastIndexOf("]");
     if (start === -1 || end < start) {
-        throw new ScanError(502, "The scanner returned an unexpected answer. Please try again.");
+        throw new ApiError(502, "The scanner returned an unexpected answer. Please try again.");
     }
 
     let list;
     try {
         list = JSON.parse(cleaned.slice(start, end + 1));
     } catch {
-        throw new ScanError(502, "The scanner returned an unexpected answer. Please try again.");
+        throw new ApiError(502, "The scanner returned an unexpected answer. Please try again.");
     }
     if (!Array.isArray(list)) {
-        throw new ScanError(502, "The scanner returned an unexpected answer. Please try again.");
+        throw new ApiError(502, "The scanner returned an unexpected answer. Please try again.");
     }
 
     return list
@@ -81,10 +82,10 @@ app.use(express.static(path.join(__dirname, "front")));
 app.post("/api/scan", upload.single("image"), async (req, res, next) => {
     try {
         if (!ai) {
-            throw new ScanError(500, "The server is missing GEMINI_API_KEY. Add it to the .env file and restart.");
+            throw new ApiError(500, "The server is missing GEMINI_API_KEY. Add it to the .env file and restart.");
         }
         if (!req.file) {
-            throw new ScanError(400, "No photo received. Please choose a photo to scan.");
+            throw new ApiError(400, "No photo received. Please choose a photo to scan.");
         }
 
         let response;
@@ -104,11 +105,27 @@ app.post("/api/scan", upload.single("image"), async (req, res, next) => {
             });
         } catch (err) {
             console.error("Gemini request failed:", err);
-            throw new ScanError(502, "We couldn't reach the ingredient scanner. Please try again in a moment.");
+            throw new ApiError(502, "We couldn't reach the ingredient scanner. Please try again in a moment.");
         }
 
         const ingredients = parseIngredientList(response.text);
         res.json({ ingredients });
+    } catch (err) {
+        next(err);
+    }
+});
+
+app.post("/api/recipes", express.json({ limit: "50kb" }), async (req, res, next) => {
+    try {
+        const { ingredients = [], maxMinutes, servings, culture } = req.body || {};
+        if (!Array.isArray(ingredients) || ingredients.length > 100) {
+            throw new ApiError(400, "ingredients must be a list of ingredient names.");
+        }
+        if (culture != null && (typeof culture !== "string" || culture.length > 50)) {
+            throw new ApiError(400, "culture must be a short text like \"Moroccan\".");
+        }
+
+        res.json(await findRecipes({ ingredients, maxMinutes, servings, culture }, { ai, model: GEMINI_MODEL }));
     } catch (err) {
         next(err);
     }
@@ -125,7 +142,10 @@ app.use((err, req, res, next) => {
             : "Couldn't read the uploaded photo. Please try again.";
         return res.status(err.code === "LIMIT_FILE_SIZE" ? 413 : 400).json({ error: message });
     }
-    if (err instanceof ScanError) {
+    if (err.type === "entity.parse.failed") {
+        return res.status(400).json({ error: "The request body isn't valid JSON." });
+    }
+    if (err instanceof ApiError) {
         return res.status(err.status).json({ error: err.message });
     }
     console.error(err);
