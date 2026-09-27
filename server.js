@@ -1,4 +1,4 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import express from "express";
 import multer from "multer";
 import path from "node:path";
@@ -7,6 +7,7 @@ import { GoogleGenAI } from "@google/genai";
 import { findRecipes } from "./recipes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 const PORT = process.env.PORT || 3000;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
@@ -22,6 +23,9 @@ const CONFIDENCES = ["high", "medium", "low"];
 const ai = process.env.GEMINI_API_KEY
     ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
     : null;
+
+// Same idea for Spoonacular: the key stays server-side, the front end calls /api/spoonacular/*.
+const SPOONACULAR_API_KEY = process.env.SPOONACULAR_API_KEY;
 
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -131,6 +135,83 @@ app.post("/api/recipes", express.json({ limit: "50kb" }), async (req, res, next)
     }
 });
 
+app.get("/api/spoonacular/ingredients", async (req, res, next) => {
+    try {
+        if (!SPOONACULAR_API_KEY) {
+            throw new ApiError(500, "The server is missing SPOONACULAR_API_KEY. Add it to the .env file and restart.");
+        }
+        const query = typeof req.query.query === "string" ? req.query.query.trim() : "";
+        if (!query) {
+            throw new ApiError(400, "query is required.");
+        }
+
+        const url = new URL("https://api.spoonacular.com/food/ingredients/search");
+        url.searchParams.set("query", query);
+        url.searchParams.set("number", "8");
+        url.searchParams.set("apiKey", SPOONACULAR_API_KEY);
+
+        const spoonacularResponse = await fetch(url);
+        const data = await spoonacularResponse.json();
+        if (!spoonacularResponse.ok) {
+            throw new ApiError(spoonacularResponse.status, data.message || "Spoonacular request failed.");
+        }
+        res.json(data);
+    } catch (err) {
+        next(err);
+    }
+});
+
+app.get("/api/spoonacular/recipes", async (req, res, next) => {
+    try {
+        if (!SPOONACULAR_API_KEY) {
+            throw new ApiError(500, "The server is missing SPOONACULAR_API_KEY. Add it to the .env file and restart.");
+        }
+        const query = typeof req.query.query === "string" ? req.query.query.trim() : "";
+        if (!query) {
+            throw new ApiError(400, "query is required.");
+        }
+
+        const url = new URL("https://api.spoonacular.com/recipes/complexSearch");
+        url.searchParams.set("query", query);
+        url.searchParams.set("number", "1");
+        url.searchParams.set("addRecipeInformation", "true");
+        url.searchParams.set("apiKey", SPOONACULAR_API_KEY);
+
+        const spoonacularResponse = await fetch(url);
+        const data = await spoonacularResponse.json();
+        if (!spoonacularResponse.ok) {
+            throw new ApiError(spoonacularResponse.status, data.message || "Spoonacular request failed.");
+        }
+        res.json(data);
+    } catch (err) {
+        next(err);
+    }
+});
+
+app.get("/api/spoonacular/recipes/:id", async (req, res, next) => {
+    try {
+        if (!SPOONACULAR_API_KEY) {
+            throw new ApiError(500, "The server is missing SPOONACULAR_API_KEY. Add it to the .env file and restart.");
+        }
+        const id = Number(req.params.id);
+        if (!Number.isInteger(id) || id <= 0) {
+            throw new ApiError(400, "Invalid recipe id.");
+        }
+
+        const url = new URL(`https://api.spoonacular.com/recipes/${id}/information`);
+        url.searchParams.set("apiKey", SPOONACULAR_API_KEY);
+
+        const spoonacularResponse = await fetch(url);
+        const data = await spoonacularResponse.json();
+        if (!spoonacularResponse.ok) {
+            throw new ApiError(spoonacularResponse.status, data.message || "Spoonacular request failed.");
+        }
+        res.json(data);
+    } catch (err) {
+        next(err);
+    }
+});
+
 app.use("/api", (req, res) => {
     res.status(404).json({ error: "Not found." });
 });
@@ -155,4 +236,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`Cooking scanner running at http://localhost:${PORT}`);
     if (!ai) console.warn("Warning: GEMINI_API_KEY is not set in .env, so scanning will fail.");
+    if (!SPOONACULAR_API_KEY) console.warn("Warning: SPOONACULAR_API_KEY is not set in .env, so recipe search will fail.");
 });

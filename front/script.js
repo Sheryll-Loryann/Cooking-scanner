@@ -13,43 +13,36 @@ const recipeInstructions = document.getElementById("recipe-instructions");
 let currentRecipeId = null;
 
 async function searchIngredients(query) {
-    const url = new URL("https://api.spoonacular.com/food/ingredients/search");
+    const url = new URL("/api/spoonacular/ingredients", window.location.origin);
     url.searchParams.set("query", query);
-    url.searchParams.set("number", "8");
-    url.searchParams.set("apiKey", SPOONACULAR_API_KEY);
 
     const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`Spoonacular request failed: ${response.status} ${response.statusText}`);
-    }
     const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || `Ingredient search failed: ${response.status}`);
+    }
     return data.results ?? [];
 }
 
 async function searchRecipes(query) {
-    const url = new URL("https://api.spoonacular.com/recipes/complexSearch");
+    const url = new URL("/api/spoonacular/recipes", window.location.origin);
     url.searchParams.set("query", query);
-    url.searchParams.set("number", "1");
-    url.searchParams.set("addRecipeInformation", "true");
-    url.searchParams.set("apiKey", SPOONACULAR_API_KEY);
 
     const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`Spoonacular request failed: ${response.status} ${response.statusText}`);
-    }
     const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || `Recipe search failed: ${response.status}`);
+    }
     return data.results ?? [];
 }
 
 async function fetchRecipeInformation(id) {
-    const url = new URL(`https://api.spoonacular.com/recipes/${id}/information`);
-    url.searchParams.set("apiKey", SPOONACULAR_API_KEY);
-
-    const response = await fetch(url);
+    const response = await fetch(`/api/spoonacular/recipes/${id}`);
+    const data = await response.json();
     if (!response.ok) {
-        throw new Error(`Spoonacular request failed: ${response.status} ${response.statusText}`);
+        throw new Error(data.error || `Recipe lookup failed: ${response.status}`);
     }
-    return response.json();
+    return data;
 }
 
 function renderMatches(results) {

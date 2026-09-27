@@ -5,7 +5,7 @@ A tool that scans your ingredients and generates recipe suggestions based on wha
 
 1. Install [Node.js](https://nodejs.org) 20 or newer.
 2. In the project folder, run `npm install`.
-3. Copy `.env.example` to `.env` (it's gitignored, never commit it) and fill in your Gemini key.
+3. Copy `.env.example` to `.env` (it's gitignored, never commit it) and fill in your Gemini and Spoonacular keys.
    `MEALDB_API_KEY=1` is TheMealDB's free test key and can stay as is.
 4. Run `npm start` and open http://localhost:3000.
 
