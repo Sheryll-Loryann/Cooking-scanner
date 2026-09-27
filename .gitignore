@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 front/config.js
-=======
 .env
 node_modules/
 .venv/
 __pycache__/
->>>>>>> fb39eecc81321a1f42a9ea8b5a49c8228b614212
