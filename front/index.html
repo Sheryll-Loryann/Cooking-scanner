@@ -69,6 +69,7 @@
                     </div>
                     <label class="field-label" for="ingredients">Ingredients you have</label>
                     <textarea id="ingredients" name="ingredients" rows="2" placeholder="Try spinach, eggs, feta..."></textarea>
+                    <ul class="ingredient-matches" id="ingredient-matches" aria-live="polite"></ul>
 
                     <div class="panel-divider"></div>
                     <div class="panel-heading preferences-heading">
@@ -142,11 +143,18 @@
                             <div class="recipe-details">
                                 <div class="detail-block">
                                     <h4>YOU’LL NEED</h4>
-                                    <p>Greens <span>·</span> grains <span>·</span> avocado <span>·</span> lemon</p>
+                                    <ul id="recipe-ingredients-list" class="ingredients-list">
+                                        <li>Greens</li>
+                                        <li>Grains</li>
+                                        <li>Avocado</li>
+                                        <li>Lemon</li>
+                                    </ul>
                                 </div>
                                 <div class="detail-block">
                                     <h4>THE SHORT VERSION</h4>
-                                    <p>Build your bowl, whisk the dressing, and bring it all together.</p>
+                                    <ol id="recipe-instructions" class="instructions-list">
+                                        <li>Build your bowl, whisk the dressing, and bring it all together.</li>
+                                    </ol>
                                 </div>
                             </div>
                             <button class="recipe-button" type="button">See the full recipe <span aria-hidden="true">→</span></button>
@@ -157,6 +165,7 @@
             </div>
             <footer class="page-footer"><span>MADE FOR THE EVERYDAY COOK</span><span>Good things are growing.</span></footer>
         </main>
+        <script src="config.js"></script>
         <script src="script.js"></script>
     </body>
 </html>
